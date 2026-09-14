@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Task manager" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <h1 class="text-4xl font-semibold text-gray-900 mb-2">{% trans "Hello from Hexlet!" %}</h1>
+        <p class="text-gray-500 mb-6">{% trans "Coding practical courses" %}</p>
+        <hr class="border-t border-gray-200 my-6">
+        <a href="#" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">{% trans "Learn More" %}</a>
+    </div>
+</div>
+{% endblock %}
