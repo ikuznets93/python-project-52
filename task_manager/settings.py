@@ -48,7 +48,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_tailwind_cli',
     'task_manager',
+    'task_manager.users',
 ]
+
+AUTH_USER_MODEL = 'users.User'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

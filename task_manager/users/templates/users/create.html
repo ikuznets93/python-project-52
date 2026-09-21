@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Task manager" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <h1 class="text-4xl font-semibold text-gray-900 mb-2">{% trans "Registration" %}</h1>
+        <form action="{% url 'create' %}" method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">{% trans "Sign up" %}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
