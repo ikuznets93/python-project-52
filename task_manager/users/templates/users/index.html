@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Users" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <h1 class="mb-6 text-3xl font-bold text-gray-900">Пользователи</h1>
+
+    <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Имя пользователя</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Полное имя</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Дата создания</th>
+                        <th scope="col" class="px-4 py-3 text-right text-sm font-medium text-gray-700">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for user in users %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ user.id }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ user.username }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ user.get_full_name|default:'-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ user.date_joined|date:"d.m.Y H:i" }}</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <a href="{% url 'update' user.id %}" class="text-blue-600 hover:text-blue-800">Изменить</a>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <a href="{% url 'delete' user.id %}" class="text-red-600 hover:text-red-800">Удалить</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Пользователей пока нет.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

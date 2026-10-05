@@ -1,10 +1,34 @@
+from django.contrib.auth import get_user_model
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.forms import UserCreationForm
+from task_manager.users.forms import CustomUserCreationForm
+from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.translation import gettext_lazy as _
+from django.urls import reverse_lazy
 
 # Create your views here.
-class CreateUserView(CreateView):
+class CreateUserView(SuccessMessageMixin, CreateView):
     template_name = 'users/create.html'
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('login')
+    success_message = _("User created successfully.")
+
 
 class UserListView(ListView):
-    pass
+    model = get_user_model()
+    template_name = 'users/index.html'
+    context_object_name = 'users'
+    ordering = ['date_joined']
+
+
+class UserUpdateView(SuccessMessageMixin, UpdateView):
+    model = get_user_model()
+    template_name = 'users/update.html'
+    fields = ['first_name', 'last_name', 'username']
+    success_url = reverse_lazy('users')
+    success_message = _("User updated successfully.")
+
+class UserDeleteView(SuccessMessageMixin, DeleteView):
+    model = get_user_model()
+    template_name = 'users/delete.html'
+    success_url = reverse_lazy('users')
+    success_message = _("User deleted successfully.")
