@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Statuses" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <h1 class="mb-6 text-3xl font-bold text-gray-900">Statuses</h1>
+    <a href="{% url 'create' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">{% trans "Create Status" %}</a>
+    <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Имя</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">Дата создания</th>
+                        <th scope="col" class="px-4 py-3 text-right text-sm font-medium text-gray-700">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for status in status_list %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ status.id }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ status.name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ status.created_at|date:"d.m.Y H:i" }}</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <div class="flex flex-col items-end space-y-1">
+                                    <a href="{% url 'update_status' status.id %}" class="text-blue-600 hover:text-blue-800">Изменить</a>
+                                    <a href="{% url 'delete_status' status.id %}" class="text-red-600 hover:text-red-800">Удалить</a>
+                                 </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">Статусов пока нет.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

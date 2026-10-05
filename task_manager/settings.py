@@ -49,10 +49,12 @@ INSTALLED_APPS = [
     'django_tailwind_cli',
     'task_manager',
     'task_manager.users',
+    'task_manager.statuses',
 ]
 
 AUTH_USER_MODEL = 'users.User'
 
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 

@@ -4,6 +4,8 @@ from task_manager.users.forms import CustomUserCreationForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 
 # Create your views here.
 class CreateUserView(SuccessMessageMixin, CreateView):
@@ -17,18 +19,30 @@ class UserListView(ListView):
     model = get_user_model()
     template_name = 'users/index.html'
     context_object_name = 'users'
-    ordering = ['date_joined']
+    ordering = ['-date_joined']
 
 
-class UserUpdateView(SuccessMessageMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = get_user_model()
     template_name = 'users/update.html'
     fields = ['first_name', 'last_name', 'username']
     success_url = reverse_lazy('users')
     success_message = _("User updated successfully.")
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj != request.user:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
-class UserDeleteView(SuccessMessageMixin, DeleteView):
+class UserDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = get_user_model()
     template_name = 'users/delete.html'
     success_url = reverse_lazy('users')
     success_message = _("User deleted successfully.")
+    
+    def dispatch(self, request, *args, **kwargs):
+            obj = self.get_object()
+            if obj != request.user:
+                raise PermissionDenied
+            return super().dispatch(request, *args, **kwargs)
