@@ -6,7 +6,7 @@
 {% block content %}
 <div class="max-w-3xl mx-auto">
     <h1 class="mb-6 text-3xl font-bold text-gray-900">Statuses</h1>
-    <a href="{% url 'create' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">{% trans "Create Status" %}</a>
+    <a href="{% url 'create_status' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded">{% trans "Create Status" %}</a>
     <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse">
@@ -19,7 +19,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
-                    {% for status in status_list %}
+                    {% for status in statuses %}
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm text-gray-900">{{ status.id }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ status.name }}</td>

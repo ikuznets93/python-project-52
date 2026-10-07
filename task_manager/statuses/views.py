@@ -10,10 +10,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 class StatusListView(ListView):
-    model = Status
     template_name = 'statuses/index.html'
-    ordering = ['-created_at']
-
+    context_object_name = 'statuses'
+    
+    def get_queryset(self):
+        return Status.objects.only('id', 'name', 'created_at').order_by(
+            'created_at'
+        )
 
 class CreateStatusView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Status

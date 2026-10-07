@@ -8,18 +8,23 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 
 # Create your views here.
+class UserListView(ListView):
+    template_name = 'users/index.html'
+    context_object_name = 'users'
+    
+    def get_queryset(self):
+        return (
+            get_user_model()
+            .objects.exclude(is_superuser=True)
+            .only('username', 'first_name', 'last_name', 'date_joined')
+        ).order_by('date_joined')
+
+
 class CreateUserView(SuccessMessageMixin, CreateView):
     template_name = 'users/create.html'
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     success_message = _("User created successfully.")
-
-
-class UserListView(ListView):
-    model = get_user_model()
-    template_name = 'users/index.html'
-    context_object_name = 'users'
-    ordering = ['-date_joined']
 
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
