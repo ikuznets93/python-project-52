@@ -11,7 +11,6 @@ from task_manager.tasks.forms import TaskForm
 
 # Create your views here.
 class TaskListView(LoginRequiredMixin, ListView):
-    model = Task
     template_name = 'tasks/index.html'
     context_object_name = 'tasks'
     
@@ -36,7 +35,7 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'task'
 
 
-class CreateTaskView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Task
     template_name = 'tasks/create.html'
     form_class = TaskForm

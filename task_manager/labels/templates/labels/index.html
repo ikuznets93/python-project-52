@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Labels" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">{% trans "Labels" %}</h1>
+        <a href="{% url 'label_create' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md">
+            {% trans "Create label" %}
+        </a>
+    </div>
+
+    <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">{% trans "Name" %}</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-700">{% trans "Created" %}</th>
+                        <th scope="col" class="px-4 py-3 text-right text-sm font-medium text-gray-700">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for label in labels %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ label.id }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ label.name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ label.created_at|date:"d.m.Y H:i" }}</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <div class="flex flex-col items-end space-y-1">
+                                    <a href="{% url 'label_update' label.id %}" class="text-blue-600 hover:text-blue-800">{% trans "Edit" %}</a>
+                                    <a href="{% url 'label_delete' label.id %}" class="text-red-600 hover:text-red-800">{% trans "Delete" %}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">{% trans "No labels yet." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

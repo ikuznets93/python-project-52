@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ task.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <h1 class="text-3xl font-semibold text-gray-900 mb-6">{{ task.name }}</h1>
+
+        <dl class="space-y-4 text-gray-700">
+            <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Description" %}</dt>
+                <dd class="mt-1">{{ task.description|default:'-' }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Status" %}</dt>
+                <dd class="mt-1">{{ task.status.name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Reporter" %}</dt>
+                <dd class="mt-1">{{ task.reporter.get_full_name|default:task.reporter.username }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Assignee" %}</dt>
+                <dd class="mt-1">{{ task.assignee.get_full_name|default:task.assignee.username|default:'-' }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Created" %}</dt>
+                <dd class="mt-1">{{ task.created_at|date:"d.m.Y H:i" }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}
