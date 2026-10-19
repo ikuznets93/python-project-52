@@ -12,6 +12,40 @@
         </a>
     </div>
 
+    <form method="get" class="mb-6 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+                <label for="{{ filter.form.status.id_for_label }}" class="mb-1 block text-sm font-medium text-gray-700">
+                    {{ filter.form.status.label }}
+                </label>
+                {{ filter.form.status }}
+            </div>
+            <div>
+                <label for="{{ filter.form.executor.id_for_label }}" class="mb-1 block text-sm font-medium text-gray-700">
+                    {{ filter.form.executor.label }}
+                </label>
+                {{ filter.form.executor }}
+            </div>
+            <div>
+                <label for="{{ filter.form.label.id_for_label }}" class="mb-1 block text-sm font-medium text-gray-700">
+                    {{ filter.form.label.label }}
+                </label>
+                {{ filter.form.label }}
+            </div>
+            <div class="flex items-end">
+                <label class="flex items-center gap-2 text-sm text-gray-700">
+                    {{ filter.form.self_tasks }}
+                    <span>{{ filter.form.self_tasks.label }}</span>
+                </label>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md">
+                {% trans "Show" %}
+            </button>
+        </div>
+    </form>
+
     <div class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse">
@@ -35,7 +69,13 @@
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ task.status.name }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ task.reporter.get_full_name|default:task.reporter.username }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-900">{{ task.assignee.get_full_name|default:task.assignee.username|default:'-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                {% if task.assignee %}
+                                    {{ task.assignee.get_full_name|default:task.assignee.username }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ task.created_at|date:"d.m.Y H:i" }}</td>
                             <td class="px-4 py-3 text-right text-sm">
                                 <div class="flex flex-col items-end space-y-1">

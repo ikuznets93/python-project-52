@@ -1,12 +1,13 @@
-from django.shortcuts import render
-
-from task_manager.statuses.models import Status
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+
 from task_manager.statuses.forms import StatusForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from task_manager.statuses.models import Status
 
 # Create your views here.
 class StatusListView(ListView):
@@ -39,3 +40,9 @@ class DeleteStatusView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name = 'statuses/delete.html'
     success_url = reverse_lazy('statuses')
     success_message = _('Status successfully deleted')
+
+    def post(self, request, *args, **kwargs):
+        if self.get_object().tasks.exists():
+            messages.error(request, _('Cannot delete status'))
+            return redirect(self.success_url)
+        return super().post(request, *args, **kwargs)

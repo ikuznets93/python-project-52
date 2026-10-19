@@ -23,7 +23,13 @@
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">{% trans "Assignee" %}</dt>
-                <dd class="mt-1">{{ task.assignee.get_full_name|default:task.assignee.username|default:'-' }}</dd>
+                <dd class="mt-1">
+                    {% if task.assignee %}
+                        {{ task.assignee.get_full_name|default:task.assignee.username }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-gray-500">{% trans "Created" %}</dt>
