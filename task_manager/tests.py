@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from task_manager.statuses.models import Status
+from task_manager.tasks.models import Task
+
 
 class LocalizationTests(TestCase):
     def test_russian_translation_is_active_by_default(self):
@@ -58,6 +61,39 @@ class LocalizationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['form'].non_field_errors())
         self.assertContains(response, 'role="alert"')
+        self.assertContains(response, 'text-red-800')
+
+
+class FormRenderingTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='john',
+            password='password123',
+        )
+        self.status = Status.objects.create(name='Open')
+        self.client.force_login(self.user)
+
+    def test_form_fields_have_visible_borders(self):
+        response = self.client.get(reverse('task_create'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'border border-gray-300')
+
+    def test_duplicate_name_error_is_shown_in_red(self):
+        Task.objects.create(
+            name='Duplicate task',
+            reporter=self.user,
+            status=self.status,
+        )
+
+        response = self.client.post(
+            reverse('task_create'),
+            {'name': 'Duplicate task', 'status': self.status.pk},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Задача с таким именем уже существует')
+        self.assertContains(response, 'text-red-600')
 
 
 class NavigationTests(TestCase):

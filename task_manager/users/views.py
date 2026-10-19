@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from task_manager.users.forms import CustomUserCreationForm
+from task_manager.users.forms import CustomUserCreationForm, UserUpdateForm
 
 # Create your views here.
 class UserListView(ListView):
@@ -34,7 +34,7 @@ class UserUpdateView(
 ):
     model = get_user_model()
     template_name = 'users/update.html'
-    fields = ['first_name', 'last_name', 'username']
+    form_class = UserUpdateForm
     success_url = reverse_lazy('users')
     success_message = _("User updated successfully.")
 

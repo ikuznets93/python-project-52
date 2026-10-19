@@ -1,13 +1,14 @@
 from django.forms import ModelForm
 
+from task_manager.forms import StyledFormMixin
 from task_manager.tasks.models import Task, get_default_status
 
 
-class TaskForm(ModelForm):
+class TaskForm(StyledFormMixin, ModelForm):
     class Meta:
         model = Task
         fields = ['name', 'description', 'status', 'assignee', 'labels']
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -19,4 +20,3 @@ class TaskForm(ModelForm):
             default_status = get_default_status()
             if default_status is not None:
                 self.initial['status'] = default_status
-        

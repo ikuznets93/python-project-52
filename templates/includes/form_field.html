@@ -1,0 +1,13 @@
+{% load i18n %}
+<div class="space-y-1">
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+        {{ field.label }}
+    </label>
+    {% for error in field.errors %}
+        <p class="text-sm text-red-600" role="alert">{{ error }}</p>
+    {% endfor %}
+    {{ field }}
+    {% if field.help_text %}
+        <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+    {% endif %}
+</div>

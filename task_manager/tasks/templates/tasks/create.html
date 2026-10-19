@@ -9,7 +9,7 @@
         <h1 class="text-4xl font-semibold text-gray-900 mb-2">{% trans "Create task" %}</h1>
         <form action="{% url 'task_create' %}" method="post" class="space-y-4">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% include "includes/form.html" %}
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md">
                 {% trans "Create" %}
             </button>
