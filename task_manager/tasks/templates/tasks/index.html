@@ -80,7 +80,9 @@
                             <td class="px-4 py-3 text-right text-sm">
                                 <div class="flex flex-col items-end space-y-1">
                                     <a href="{% url 'task_update' task.id %}" class="text-blue-600 hover:text-blue-800">{% trans "Edit" %}</a>
-                                    <a href="{% url 'task_delete' task.id %}" class="text-red-600 hover:text-red-800">{% trans "Delete" %}</a>
+                                    {% if request.user == task.reporter %}
+                                        <a href="{% url 'task_delete' task.id %}" class="text-red-600 hover:text-red-800">{% trans "Delete" %}</a>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

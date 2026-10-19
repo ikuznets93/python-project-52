@@ -18,9 +18,11 @@
                     <a href="{% url 'index' %}" class="text-lg font-semibold text-gray-900">{% trans "Task manager" %}</a>
                     <nav class="hidden sm:flex space-x-4 text-sm">
                         <a href="{% url 'users' %}" class="text-gray-600 hover:text-gray-900">{% trans "Users" %}</a>
+                        {% if user.is_authenticated %}
                         <a href="{% url 'statuses' %}" class="text-gray-600 hover:text-gray-900">{% trans "Statuses" %}</a>
                         <a href="{% url 'labels' %}" class="text-gray-600 hover:text-gray-900">{% trans "Labels" %}</a>
                         <a href="{% url 'tasks' %}" class="text-gray-600 hover:text-gray-900">{% trans "Tasks" %}</a>
+                        {% endif %}
                     </nav>
                 </div>
                 <div class="text-sm space-x-4">
@@ -43,7 +45,7 @@
   {% if messages %}
   <div class="container mx-auto px-4 pt-4">
     {% for message in messages %}
-    <div class="rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="alert">
+    <div class="rounded border px-4 py-3 text-sm {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-800{% elif message.tags == 'warning' %}border-yellow-200 bg-yellow-50 text-yellow-800{% elif message.tags == 'success' %}border-green-200 bg-green-50 text-green-800{% else %}border-gray-200 bg-gray-50 text-gray-800{% endif %}" role="alert">
       {{ message }}
     </div>
     {% endfor %}

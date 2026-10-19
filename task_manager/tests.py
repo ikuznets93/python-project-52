@@ -58,3 +58,28 @@ class LocalizationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['form'].non_field_errors())
         self.assertContains(response, 'role="alert"')
+
+
+class NavigationTests(TestCase):
+    def test_anonymous_sees_only_users_link(self):
+        response = self.client.get(reverse('index'))
+        body = response.content.decode()
+
+        self.assertIn(f'href="{reverse("users")}"', body)
+        for name in ('statuses', 'labels', 'tasks'):
+            with self.subTest(name=name):
+                self.assertNotIn(f'href="{reverse(name)}"', body)
+
+    def test_authenticated_user_sees_all_app_links(self):
+        user = get_user_model().objects.create_user(
+            username='john',
+            password='password123',
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('index'))
+        body = response.content.decode()
+
+        for name in ('users', 'statuses', 'labels', 'tasks'):
+            with self.subTest(name=name):
+                self.assertIn(f'href="{reverse(name)}"', body)

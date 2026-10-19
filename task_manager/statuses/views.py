@@ -10,7 +10,7 @@ from task_manager.statuses.forms import StatusForm
 from task_manager.statuses.models import Status
 
 # Create your views here.
-class StatusListView(ListView):
+class StatusListView(LoginRequiredMixin, ListView):
     template_name = 'statuses/index.html'
     context_object_name = 'statuses'
     

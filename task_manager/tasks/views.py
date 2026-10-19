@@ -37,12 +37,6 @@ class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.reporter = self.request.user
-        
-        if not form.instance.status_id:
-            default_status = Task.objects.filter(status__is_default=True).first()
-            if default_status:
-                form.instance.status = default_status.status
-
         return super().form_valid(form)
 
 class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -52,16 +46,19 @@ class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('tasks')
     success_message = _('Task successfully updated')
 
-class TaskDeleteView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class TaskDeleteView(
+    LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView
+):
     model = Task
     template_name = 'tasks/delete.html'
     success_url = reverse_lazy('tasks')
     success_message = _('Task successfully deleted')
 
     def test_func(self):
-        task = self.get_object()
-        return task.reporter == self.request.user
+        return self.get_object().reporter == self.request.user
 
     def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
         messages.error(self.request, _('Only the author can delete this task.'))
         return redirect('tasks')

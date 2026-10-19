@@ -79,3 +79,80 @@ class UserDeleteViewTests(TestCase):
             get_user_model().objects.filter(pk=self.user.pk).exists()
         )
         self.assertTrue(Task.objects.filter(pk=task.pk).exists())
+
+
+class UserPermissionTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.owner = user_model.objects.create_user(
+            username='owner',
+            password='password123',
+        )
+        self.other = user_model.objects.create_user(
+            username='other',
+            password='password123',
+        )
+        self.client.force_login(self.other)
+
+    def test_anonymous_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('update', args=[self.owner.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+
+    def test_non_owner_cannot_open_update_page(self):
+        response = self.client.get(reverse('update', args=[self.owner.pk]))
+
+        self.assertRedirects(response, reverse('users'))
+
+    def test_non_owner_cannot_update_another_user(self):
+        response = self.client.post(
+            reverse('update', args=[self.owner.pk]),
+            {'username': 'hijacked', 'first_name': '', 'last_name': ''},
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse('users'))
+        self.assertContains(
+            response, 'Вы не можете редактировать другого пользователя'
+        )
+        self.owner.refresh_from_db()
+        self.assertEqual(self.owner.username, 'owner')
+
+    def test_non_owner_cannot_delete_another_user(self):
+        response = self.client.post(
+            reverse('delete', args=[self.owner.pk]), follow=True
+        )
+
+        self.assertRedirects(response, reverse('users'))
+        self.assertContains(
+            response, 'Вы не можете удалить другого пользователя'
+        )
+        self.assertTrue(
+            get_user_model().objects.filter(pk=self.owner.pk).exists()
+        )
+
+    def test_owner_can_update_own_profile(self):
+        self.client.force_login(self.owner)
+
+        response = self.client.post(
+            reverse('update', args=[self.owner.pk]),
+            {'username': 'owner', 'first_name': 'Ann', 'last_name': 'Author'},
+        )
+
+        self.assertRedirects(response, reverse('users'))
+        self.owner.refresh_from_db()
+        self.assertEqual(self.owner.get_full_name(), 'Ann Author')
+
+    def test_other_users_have_no_edit_links_in_list(self):
+        response = self.client.get(reverse('users'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(
+            response, reverse('update', args=[self.owner.pk])
+        )
+        self.assertNotContains(
+            response, reverse('delete', args=[self.owner.pk])
+        )

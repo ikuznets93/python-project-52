@@ -27,9 +27,11 @@
                             <td class="px-4 py-3 text-sm text-gray-900">{{ user.get_full_name|default:'-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-900">{{ user.date_joined|date:"d.m.Y H:i" }}</td>
                             <td class="px-4 py-3 text-right text-sm">
-                                <a href="{% url 'update' user.id %}" class="text-blue-600 hover:text-blue-800">{% trans "Edit" %}</a>
-                                <span class="mx-2 text-gray-300">|</span>
-                                <a href="{% url 'delete' user.id %}" class="text-red-600 hover:text-red-800">{% trans "Delete" %}</a>
+                                {% if request.user == user %}
+                                    <a href="{% url 'update' user.id %}" class="text-blue-600 hover:text-blue-800">{% trans "Edit" %}</a>
+                                    <span class="mx-2 text-gray-300">|</span>
+                                    <a href="{% url 'delete' user.id %}" class="text-red-600 hover:text-red-800">{% trans "Delete" %}</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
