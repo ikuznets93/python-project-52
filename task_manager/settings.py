@@ -10,12 +10,65 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+import sys
+from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlparse
+
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def env_bool(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+def env_int(name, default):
+    value = os.getenv(name)
+    return int(value) if value else default
+
+
+def env_list(name, default=''):
+    return [
+        item.strip()
+        for item in os.getenv(name, default).split(',')
+        if item.strip()
+    ]
+
+
+def database_config(url):
+    parsed = urlparse(url)
+
+    if parsed.scheme == 'sqlite':
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': parsed.path,
+        }
+
+    if parsed.scheme in ('postgres', 'postgresql'):
+        config = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed.path.lstrip('/'),
+            'USER': unquote(parsed.username or ''),
+            'PASSWORD': unquote(parsed.password or ''),
+            'HOST': parsed.hostname or '',
+            'PORT': parsed.port or '',
+        }
+        options = dict(parse_qsl(parsed.query))
+        if options:
+            config['OPTIONS'] = options
+        return config
+
+    raise ImproperlyConfigured(
+        f'Unsupported DATABASE_URL scheme: {parsed.scheme}'
+    )
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,17 +77,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = env_bool('DEBUG', default=False)
+
+# Tests always run with development-friendly settings, regardless of the
+# environment: no HTTPS redirects, no secure-only cookies and plain static
+# file storage. Production behaviour is enabled for every other command.
+TESTING = 'test' in sys.argv
+PRODUCTION = not DEBUG and not TESTING
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if PRODUCTION:
+        raise ImproperlyConfigured(
+            'The SECRET_KEY environment variable must be set in production.'
+        )
+    SECRET_KEY = 'django-insecure-development-only-secret-key'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', '127.0.0.1,localhost,webserver')
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'webserver',
-    ]
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS')
 
 
 # Application definition
@@ -64,13 +127,16 @@ LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "django.middleware.locale.LocaleMiddleware",
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if PRODUCTION:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'task_manager.urls'
 
@@ -97,12 +163,17 @@ WSGI_APPLICATION = 'task_manager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {'default': database_config(DATABASE_URL)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 # Password validation
@@ -148,16 +219,53 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'assets']
+
+if PRODUCTION:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+if not PRODUCTION:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        },
+    }
+else:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+            'OPTIONS': {
+                'host': os.getenv('EMAIL_HOST', 'localhost'),
+                'port': env_int('EMAIL_PORT', 587),
+                'username': os.getenv('EMAIL_HOST_USER', ''),
+                'password': os.getenv('EMAIL_HOST_PASSWORD', ''),
+                'use_tls': env_bool('EMAIL_USE_TLS', True),
+            },
+        },
+    }
 
-STATICFILES_DIRS = [BASE_DIR / 'assets']
+
+# Security settings for production
+# https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+
+if PRODUCTION:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', default=True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = env_int('SECURE_HSTS_SECONDS', 31536000)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
