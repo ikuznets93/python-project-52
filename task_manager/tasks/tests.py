@@ -271,3 +271,140 @@ class TaskFormDefaultStatusTests(TestCase):
         response = self.client.get(reverse('task_create'))
 
         self.assertContains(response, f'value="{status.pk}" selected')
+
+
+class TaskAccessTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='author',
+            password='password123',
+        )
+        self.task = Task.objects.create(
+            name='Task',
+            reporter=self.user,
+            status=Status.objects.create(name='Open'),
+        )
+
+    def test_anonymous_is_redirected_from_task_list(self):
+        response = self.client.get(reverse('tasks'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+
+    def test_anonymous_is_redirected_from_task_detail(self):
+        response = self.client.get(
+            reverse('task_detail', args=[self.task.pk])
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+
+
+class TaskCreateViewTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.author = user_model.objects.create_user(
+            username='author',
+            password='password123',
+        )
+        self.assignee = user_model.objects.create_user(
+            username='assignee',
+            password='password123',
+        )
+        self.status = Status.objects.create(name='Open')
+        self.label = Label.objects.create(name='bug')
+        self.client.force_login(self.author)
+
+    def test_anonymous_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('task_create'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+
+    def test_authenticated_user_can_create_task(self):
+        response = self.client.post(
+            reverse('task_create'),
+            {
+                'name': 'New task',
+                'description': 'Details',
+                'status': self.status.pk,
+                'assignee': self.assignee.pk,
+                'labels': [self.label.pk],
+            },
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse('tasks'))
+        task = Task.objects.get(name='New task')
+        self.assertEqual(task.reporter, self.author)
+        self.assertEqual(task.assignee, self.assignee)
+        self.assertEqual(task.status, self.status)
+        self.assertIn(self.label, task.labels.all())
+        self.assertContains(response, 'Задача успешно создана')
+
+    def test_task_requires_status(self):
+        response = self.client.post(
+            reverse('task_create'),
+            {'name': 'No status', 'description': ''},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('status', response.context['form'].errors)
+        self.assertFalse(Task.objects.filter(name='No status').exists())
+
+
+class TaskUpdateViewTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.author = user_model.objects.create_user(
+            username='author',
+            password='password123',
+        )
+        self.assignee = user_model.objects.create_user(
+            username='assignee',
+            password='password123',
+        )
+        self.status = Status.objects.create(name='Open')
+        self.new_status = Status.objects.create(name='Done')
+        self.label = Label.objects.create(name='bug')
+        self.task = Task.objects.create(
+            name='Old task',
+            description='Old description',
+            reporter=self.author,
+            status=self.status,
+        )
+        self.client.force_login(self.author)
+
+    def test_anonymous_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.get(
+            reverse('task_update', args=[self.task.pk])
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+
+    def test_authenticated_user_can_update_task(self):
+        response = self.client.post(
+            reverse('task_update', args=[self.task.pk]),
+            {
+                'name': 'Updated task',
+                'description': 'Updated description',
+                'status': self.new_status.pk,
+                'assignee': self.assignee.pk,
+                'labels': [self.label.pk],
+            },
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse('tasks'))
+        self.task.refresh_from_db()
+        self.assertEqual(self.task.name, 'Updated task')
+        self.assertEqual(self.task.description, 'Updated description')
+        self.assertEqual(self.task.status, self.new_status)
+        self.assertEqual(self.task.assignee, self.assignee)
+        self.assertIn(self.label, self.task.labels.all())
+        self.assertContains(response, 'Задача успешно изменена')

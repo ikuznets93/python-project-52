@@ -102,6 +102,17 @@ class UserPermissionTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse('login'), response['Location'])
 
+    def test_anonymous_cannot_delete_user(self):
+        self.client.logout()
+
+        response = self.client.post(reverse('delete', args=[self.owner.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('login'), response['Location'])
+        self.assertTrue(
+            get_user_model().objects.filter(pk=self.owner.pk).exists()
+        )
+
     def test_non_owner_cannot_open_update_page(self):
         response = self.client.get(reverse('update', args=[self.owner.pk]))
 
@@ -155,4 +166,54 @@ class UserPermissionTests(TestCase):
         )
         self.assertNotContains(
             response, reverse('delete', args=[self.owner.pk])
+        )
+
+
+class UserCreateViewTests(TestCase):
+    def test_anonymous_can_open_registration_page(self):
+        response = self.client.get(reverse('create'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="username"')
+        self.assertContains(response, 'name="password1"')
+        self.assertContains(response, 'name="password2"')
+
+    def test_user_can_register(self):
+        response = self.client.post(
+            reverse('create'),
+            {
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'username': 'john',
+                'password1': 'very-secret-password-123',
+                'password2': 'very-secret-password-123',
+            },
+            follow=True,
+        )
+
+        self.assertRedirects(response, reverse('login'))
+        user = get_user_model().objects.get(username='john')
+        self.assertEqual(user.get_full_name(), 'John Doe')
+        self.assertTrue(user.check_password('very-secret-password-123'))
+        self.assertContains(response, 'Пользователь успешно создан.')
+
+    def test_registration_rejects_duplicate_username(self):
+        get_user_model().objects.create_user(
+            username='john',
+            password='password123',
+        )
+
+        response = self.client.post(
+            reverse('create'),
+            {
+                'username': 'john',
+                'password1': 'very-secret-password-123',
+                'password2': 'very-secret-password-123',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('username', response.context['form'].errors)
+        self.assertEqual(
+            get_user_model().objects.filter(username='john').count(), 1
         )
