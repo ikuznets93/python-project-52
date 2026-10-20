@@ -28,6 +28,16 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
+### Сборка CSS
+
+Если менялись шаблоны или Tailwind-классы, пересоберите стили:
+
+```bash
+uv run python manage.py tailwind build --force
+```
+
+Собранный `assets/css/tailwind.css` хранится в репозитории и попадает в `staticfiles` при `collectstatic`.
+
 ## Развёртывание на Render
 
 В репозитории есть `render.yaml` — [Blueprint](https://render.com/docs/infrastructure-as-code),
