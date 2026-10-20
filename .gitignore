@@ -1,2 +1,15 @@
 .env
 staticfiles/
+*.sqlite3
+__pycache__/
+*.py[cod]
+.django_tailwind_cli/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+*.log
+.DS_Store
