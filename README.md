@@ -49,24 +49,6 @@ uv run python manage.py tailwind build --force
 
 Собранный `assets/css/tailwind.css` хранится в репозитории и попадает в `staticfiles` при `collectstatic`.
 
-## Мониторинг ошибок
-
-Необработанные исключения отправляются в [Rollbar](https://rollbar.com/),
-если задан токен проекта.
-
-1. Создайте проект в Rollbar и скопируйте токен с типом
-   `post_server_item`.
-2. Добавьте переменные в `.env`:
-   ```env
-   ROLLBAR_ACCESS_TOKEN=ваш_токен
-   ROLLBAR_ENVIRONMENT=development
-   ```
-3. На Railway добавьте те же переменные. Для production укажите
-   `ROLLBAR_ENVIRONMENT=production`.
-
-Если `ROLLBAR_ACCESS_TOKEN` пуст, Rollbar не подключается и приложение
-работает без отправки ошибок.
-
 <details>
 <summary>Автоматические тесты Хекслета</summary>
 
