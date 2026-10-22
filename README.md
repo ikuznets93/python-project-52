@@ -1,6 +1,8 @@
 # Менеджер задач (Python)
 
 [![hexlet-check](https://github.com/ikuznets93/python-project-52/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ikuznets93/python-project-52/actions)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ikuznets93_python-project-52&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ikuznets93_python-project-52)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ikuznets93_python-project-52&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ikuznets93_python-project-52)
 
 На практике узнаете о проектировании баз данных, PaaS, мониторинге ошибок, ORM, фреймворке Django, шаблонизации и Tailwind CSS.
 
