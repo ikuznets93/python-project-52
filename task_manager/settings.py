@@ -157,6 +157,22 @@ MIDDLEWARE = [
 if PRODUCTION:
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
+ROLLBAR_ACCESS_TOKEN = os.getenv('ROLLBAR_ACCESS_TOKEN', '')
+if ROLLBAR_ACCESS_TOKEN and not TESTING:
+    ROLLBAR = {
+        'access_token': ROLLBAR_ACCESS_TOKEN,
+        'environment': os.getenv('ROLLBAR_ENVIRONMENT')
+        or ('production' if PRODUCTION else 'development'),
+        'code_version': os.getenv('GIT_SHA', '1.0.0'),
+        'root': str(BASE_DIR),
+    }
+
+    # Rollbar must be the last middleware so it can report exceptions
+    # raised by the application.
+    MIDDLEWARE.append(
+        'rollbar.contrib.django.middleware.RollbarNotifierMiddleware'
+    )
+
 ROOT_URLCONF = 'task_manager.urls'
 
 TEMPLATES = [
