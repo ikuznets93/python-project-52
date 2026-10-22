@@ -5,11 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "coverage>=7.16.2",
     "django>=6.1.1",
     "django-filter>=26.2",
     "django-tailwind-cli>=4.8.0",
     "dotenv>=0.9.9",
     "gunicorn>=26.2.0",
     "psycopg[binary]>=3.3.6",
+    "ruff>=0.17.1",
     "whitenoise>=6.12.0",
 ]
