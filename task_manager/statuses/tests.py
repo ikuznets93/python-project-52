@@ -97,11 +97,10 @@ class DefaultStatusTests(TestCase):
         first = Status.objects.create(name='First')
         second = Status.objects.create(name='Second')
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                Status.objects.filter(pk__in=[first.pk, second.pk]).update(
-                    is_default=True
-                )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Status.objects.filter(pk__in=[first.pk, second.pk]).update(
+                is_default=True
+            )
 
 
 class StatusCreateViewTests(TestCase):
@@ -173,4 +172,4 @@ class StatusUpdateViewTests(TestCase):
         self.assertRedirects(response, reverse('statuses'))
         self.status.refresh_from_db()
         self.assertEqual(self.status.name, 'Done')
-        self.assertContains(response, 'Статус успешно изменён')
+        self.assertContains(response, 'Статус успешно изменен')

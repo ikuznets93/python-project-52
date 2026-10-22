@@ -1,14 +1,15 @@
 from django.contrib import messages
-from django.shortcuts import redirect
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+
 from task_manager.tasks.filters import TaskFilter
-from task_manager.tasks.models import Task
 from task_manager.tasks.forms import TaskForm
+from task_manager.tasks.models import Task
 
 
 # Create your views here.
@@ -21,6 +22,7 @@ class TaskListView(LoginRequiredMixin, FilterView):
         return Task.objects.select_related(
             'status', 'reporter', 'assignee'
         ).order_by('created_at')
+
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
     model = Task
@@ -39,12 +41,14 @@ class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         form.instance.reporter = self.request.user
         return super().form_valid(form)
 
+
 class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Task
     template_name = 'tasks/update.html'
     form_class = TaskForm
     success_url = reverse_lazy('tasks')
     success_message = _('Task successfully updated')
+
 
 class TaskDeleteView(
     LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView

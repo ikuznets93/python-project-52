@@ -8,7 +8,10 @@ INPUT_CLASS = (
 TEXTAREA_CLASS = f'{INPUT_CLASS} min-h-32'
 SELECT_CLASS = INPUT_CLASS
 SELECT_MULTIPLE_CLASS = f'{INPUT_CLASS} h-32'
-CHECKBOX_CLASS = 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+CHECKBOX_CLASS = (
+    'h-4 w-4 rounded border-gray-300 text-blue-600 '
+    'focus:ring-blue-500'
+)
 
 
 class StyledFormMixin:

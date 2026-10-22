@@ -18,6 +18,16 @@
                 <dd class="mt-1">{{ task.status.name }}</dd>
             </div>
             <div>
+                <dt class="text-sm font-medium text-gray-500">{% trans "Labels" %}</dt>
+                <dd class="mt-1">
+                    {% if task.labels.all %}
+                        {{ task.labels.all|join:", " }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
                 <dt class="text-sm font-medium text-gray-500">{% trans "Reporter" %}</dt>
                 <dd class="mt-1">{{ task.reporter.get_full_name|default:task.reporter.username }}</dd>
             </div>

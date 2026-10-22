@@ -5,7 +5,11 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 class Status(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        verbose_name=_('Name'),
+    )
     is_default = models.BooleanField(
         default=False,
         verbose_name=_('Default'),

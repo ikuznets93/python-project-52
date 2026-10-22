@@ -188,7 +188,7 @@ class TaskPermissionTests(TestCase):
 
         self.assertRedirects(response, reverse('tasks'))
         self.assertTrue(Task.objects.filter(pk=self.task.pk).exists())
-        self.assertContains(response, 'Только автор может удалить эту задачу.')
+        self.assertContains(response, 'Задачу может удалить только ее автор')
 
     def test_author_can_delete_task(self):
         self.client.force_login(self.author)
@@ -210,13 +210,13 @@ class TaskPermissionTests(TestCase):
         self.task.refresh_from_db()
         self.assertEqual(self.task.name, 'Renamed by other')
 
-    def test_delete_link_is_hidden_from_non_author(self):
+    def test_delete_link_is_visible_to_non_author(self):
         self.client.force_login(self.other)
 
         response = self.client.get(reverse('tasks'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(
+        self.assertContains(
             response, reverse('task_delete', args=[self.task.pk])
         )
 

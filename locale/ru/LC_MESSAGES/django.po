@@ -169,11 +169,11 @@ msgstr "Статус успешно создан"
 
 #: task_manager/statuses/views.py:35
 msgid "Status successfully updated"
-msgstr "Статус успешно изменён"
+msgstr "Статус успешно изменен"
 
 #: task_manager/statuses/views.py:42
 msgid "Status successfully deleted"
-msgstr "Статус успешно удалён"
+msgstr "Статус успешно удален"
 
 #: task_manager/statuses/views.py:46
 msgid "Cannot delete status"
@@ -257,7 +257,7 @@ msgstr "Задача успешно удалена"
 
 #: task_manager/tasks/views.py:63
 msgid "Only the author can delete this task."
-msgstr "Только автор может удалить эту задачу."
+msgstr "Задачу может удалить только ее автор"
 
 #: task_manager/templates/registration/login.html:9
 #: task_manager/templates/registration/login.html:32
@@ -285,13 +285,21 @@ msgstr "Имя пользователя"
 msgid "Password"
 msgstr "Пароль"
 
+#: task_manager/users/forms.py
+msgid "Password confirmation"
+msgstr "Подтверждение пароля"
+
+#: task_manager/users/forms.py
+msgid "The two password fields did not match."
+msgstr "Введённые пароли не совпадают."
+
 #: task_manager/users/templates/users/create.html:9
 msgid "Registration"
 msgstr "Регистрация"
 
-#: task_manager/users/templates/users/create.html:13 templates/base.html:37
+#: task_manager/users/templates/users/create.html:13
 msgid "Sign up"
-msgstr "Зарегистрироваться"
+msgstr "Зарегистрировать"
 
 #: task_manager/users/templates/users/delete.html:5
 msgid "Delete user"
@@ -317,11 +325,11 @@ msgstr "Изменить пользователя"
 
 #: task_manager/users/views.py:29
 msgid "User created successfully."
-msgstr "Пользователь успешно создан."
+msgstr "Пользователь успешно зарегистрирован"
 
 #: task_manager/users/views.py:39
 msgid "User updated successfully."
-msgstr "Пользователь успешно изменён."
+msgstr "Пользователь успешно изменен"
 
 #: task_manager/users/views.py:47
 msgid "You cannot edit another user"
@@ -329,7 +337,7 @@ msgstr "Вы не можете редактировать другого пол�
 
 #: task_manager/users/views.py:57
 msgid "User deleted successfully."
-msgstr "Пользователь успешно удалён."
+msgstr "Пользователь успешно удален"
 
 #: task_manager/users/views.py:65
 msgid "You cannot delete another user"
@@ -343,13 +351,21 @@ msgstr "Невозможно удалить пользователя"
 msgid "Hello"
 msgstr "Привет"
 
+#: task_manager/views.py
+msgid "You are logged in"
+msgstr "Вы залогинены"
+
+#: task_manager/views.py
+msgid "You are logged out"
+msgstr "Вы разлогинены"
+
 #: templates/base.html:33
 msgid "Sign out"
-msgstr "Выйти"
+msgstr "Выход"
 
 #: templates/base.html:36
-msgid "Sign in"
-msgstr "Войти"
+msgid "Login"
+msgstr "Вход"
 
 #: templates/layouts/delete.html:13
 msgid "Are you sure you want to delete"

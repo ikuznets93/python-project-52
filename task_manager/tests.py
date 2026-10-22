@@ -42,7 +42,9 @@ class LocalizationTests(TestCase):
                 self.assertNotIn(untranslated, body)
 
     def test_english_locale_still_available(self):
-        response = self.client.get(reverse('index'), headers={'accept-language': 'en'})
+        response = self.client.get(
+            reverse('index'), headers={'accept-language': 'en'}
+        )
 
         self.assertContains(response, 'Task manager')
         self.assertNotContains(response, 'Менеджер задач')

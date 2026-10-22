@@ -10,7 +10,6 @@ from task_manager.labels.forms import LabelForm
 from task_manager.labels.models import Label
 
 
-
 class LabelListView(LoginRequiredMixin, ListView):
     template_name = 'labels/index.html'
     context_object_name = 'labels'

@@ -195,7 +195,7 @@ class UserCreateViewTests(TestCase):
         user = get_user_model().objects.get(username='john')
         self.assertEqual(user.get_full_name(), 'John Doe')
         self.assertTrue(user.check_password('very-secret-password-123'))
-        self.assertContains(response, 'Пользователь успешно создан.')
+        self.assertContains(response, 'Пользователь успешно зарегистрирован')
 
     def test_registration_rejects_duplicate_username(self):
         get_user_model().objects.create_user(
