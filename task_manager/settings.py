@@ -99,15 +99,6 @@ ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', '127.0.0.1,localhost,webserver')
 
 CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS')
 
-# Render sets these variables automatically for web services.
-RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-RENDER_EXTERNAL_URL = os.getenv('RENDER_EXTERNAL_URL', '').rstrip('/')
-if RENDER_EXTERNAL_URL:
-    CSRF_TRUSTED_ORIGINS.append(RENDER_EXTERNAL_URL)
-
 # Railway sets these variables automatically for deployed services.
 RAILWAY_PUBLIC_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN')
 if RAILWAY_PUBLIC_DOMAIN:
@@ -167,8 +158,6 @@ if ROLLBAR_ACCESS_TOKEN and not TESTING:
         'root': str(BASE_DIR),
     }
 
-    # Rollbar must be the last middleware so it can report exceptions
-    # raised by the application.
     MIDDLEWARE.append(
         'rollbar.contrib.django.middleware.RollbarNotifierMiddleware'
     )
